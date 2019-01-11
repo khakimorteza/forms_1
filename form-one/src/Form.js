@@ -1,5 +1,7 @@
 import React from "react";
-const countries = require("./countries.json");
+import Radio from "./Radio.js";
+import Selects from "./Selects.js";
+import Checkbox from "./Checkboxs.js";
 
 class Form extends React.Component {
   constructor() {
@@ -10,8 +12,16 @@ class Form extends React.Component {
       diet: "",
       country: "",
       formCompleted: false,
-      formSubmitted: false
+      formSubmitted: false,
+      underwater: "",
+      marital_status: "",
+      stress_level: "",
+      claustrophobic: "",
+      siblings: false,
+      parents: false,
+      grandparents: false
     };
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
 
   handleChange = event => {
@@ -27,6 +37,27 @@ class Form extends React.Component {
     });
   };
 
+  handleCheckboxChange(event) {
+    debugger;
+    this.setState({
+      [event.target.name]: event.target.checked
+    });
+  }
+
+  // handleCheckboxChange(event) {
+  //   if (event.target.id) {
+  //     let newState = this.state[event.target.name];
+  //     newState[event.target.id] = event.target.checked;
+  //     this.setState({
+  //       [event.target.name]: newState
+  //     });
+  //   } else {
+  //     this.setState({
+  //       [event.target.name]: event.target.checked
+  //     });
+  //   }
+  // }
+
   handleConfirm = event => {
     event.preventDefault();
     this.setState({
@@ -37,20 +68,25 @@ class Form extends React.Component {
   render() {
     const {
       name,
-      birthday,
       reason,
-      diet,
       formCompleted,
       formSubmitted,
-      country
+      diet,
+      country,
+      birthday
     } = this.state;
+
+    console.log(this.state);
+
     if (!formSubmitted) {
       return (
         <>
           <h1>Mission to Mars Registration Form</h1>
           <div>
             <form className="form" onChange={this.handleChange}>
-              <label htmlFor="name">Name</label>
+              <label htmlFor="name">
+                Name <abbr title="required">*</abbr>
+              </label>
               <input
                 name="name"
                 type="text"
@@ -58,29 +94,13 @@ class Form extends React.Component {
                 value={name}
                 id="name"
               />
-              <label htmlFor="DOB"> Date Of Birth: </label>
-              <input
-                type="date"
-                id="dob"
-                name="birthday"
-                value={birthday}
-                min="1900-01-01"
-                max="2019-01-31"
+
+              <Selects
+                handleSelect={this.handleChange}
+                birthday={this.state.birthday}
+                diet={this.state.diet}
+                country={this.state.country}
               />
-
-              <label htmlFor="Country">Country</label>
-              <select name="country">
-                {["", ...countries].map(country => (
-                  <option value={country.name}>{country.name}</option>
-                ))}
-              </select>
-
-              <label htmlFor="dietary">What do you want to eat?</label>
-              <select name="diet" value={diet}>
-                <option value="omnivore">Omnivore</option>
-                <option value="vegeterian">Vegetarian</option>
-                <option value="vegan">Vegan</option>
-              </select>
 
               <label htmlFor="yourReason">
                 Why do want to be a Mars Explorer?
@@ -97,9 +117,24 @@ class Form extends React.Component {
                 value={reason}
               />
 
+              <Radio
+                handleRadioChange={this.handleChange}
+                underwater={this.state.underwater}
+                marital_status={this.state.marital_status}
+                stress_level={this.state.stress_level}
+                claustrophobic={this.state.claustrophobic}
+              />
+
+              <Checkbox
+                handleCheckboxChange={this.handleCheckboxChange}
+                siblings={this.state.siblings}
+                parents={this.state.parents}
+                grandparents={this.state.grandparents}
+              />
+
               <button onClick={this.handleSubmit}>Submit</button>
               <div className="formSubmit">
-                <ul>
+                <p>
                   {formCompleted
                     ? `
                   Your name: ${name}
@@ -109,12 +144,16 @@ class Form extends React.Component {
                   Country: ${country}
                   is the information correct?`
                     : ""}
-                </ul>
+                </p>
               </div>
             </form>
           </div>
 
-          <button onClick={this.handleConfirm}>Confirm</button>
+          {formCompleted ? (
+            <button onClick={this.handleConfirm}>Confirm</button>
+          ) : (
+            ""
+          )}
         </>
       );
     } else {
